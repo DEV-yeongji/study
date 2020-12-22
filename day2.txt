@@ -1,0 +1,116 @@
+22020.12.21
+
+★ Spring Framework ?  다른 프레임워크와 다르게 뚜렷한 차별성이 있다.
+1. java의 클래스와 인터페이스를 이용하는 구조이기 때문에 다른 프레임워크에 비해 복잡하지 않음
+2. Web 이라는 제한된 영역에서 사용하나, 근본적인 것은 OOP를 뒷받침 하기때문에 전체 구조를 설계하기 유용함
+3. 스프링은 다른 프레임워크들과의 통합을 지원한다.
+4. 개발 생산성과 개발도구를 지원한다. (sts,eclipse,intellij...)
+
+★ 스프링의 주요특징
+1. 자바의 코드를 이용해서 객체를 구성하는 방식을 사용할 수 있다.
+2. 의존성 주입 (Dependency Injection) 을 통해 유지보수가 쉽다.
+3. AOP(쉽게말해 공통부분) 를 지원한다. 
+4. 편리한 MVC 구조
+5. WAS의 종속적이지 않은 개발 환경
+
+----------
+# DI (Dependency Injection) 의 중요성
+- 코드의 재활용성을 높여준다.
+- 객체 간의 의존성을 줄여주고 유연한 코드를 작성할 수 있다.
+만약, DI를 사용하지 않는다면 바꾸고 싶은 코드를 일일히 직접 수정해야 한다.
+
+DI 예제 1 )
+Calculator클래스와 MyCalculator 클래스를 Spring Bean Configuration File을 이용하여 생성하자.(xml을 이용하여 객체 생성)
+그리고 main 메소드가 있는 클래스를 만들고 거기서 사칙연산을 해보자.
+--------------------------------------------------------------------------------------------------------------------------------
+public class Calculator {
+	public void addition(int f, int s) {
+		System.out.println("addition()");
+		int result = f + s;
+		System.out.println(f + " + " + s + " = " + result);
+	}
+	
+	public void subtraction(int f, int s) {
+		System.out.println("subtraction()");
+		int result = f - s;
+		System.out.println(f + " - " + s + " = " + result);
+	}
+	
+	public void multiplication(int f, int s) {
+		System.out.println("multiplication()");
+		int result = f * s;
+		System.out.println(f + " * " + s + " = " + result);
+	}
+	
+	public void division(int f, int s) {
+		System.out.println("division()");
+		int result = f / s;
+		System.out.println(f + " / " + s + " = " + result);
+	}
+}
+--------------------------------------------------------------------------------------------------------------------------------
+public class MyCalculator {
+	Calculator calculator;
+	private int firstNum;
+	private int secondNum;
+	
+	public MyCalculator() {
+
+	}
+
+	public void add() {
+		calculator.addition(firstNum, secondNum);
+	}
+	
+	public void sub() {
+		calculator.subtraction(firstNum, secondNum);
+	}
+	
+	public void mul() {
+		calculator.multiplication(firstNum, secondNum);
+	}
+	
+	public void div() {
+		calculator.division(firstNum, secondNum);
+	}
+	
+	public void setCalculator(Calculator calculator) {
+		this.calculator = calculator;
+	}
+	
+	public void setFirstNum(int firstNum) {
+		this.firstNum = firstNum;
+	}
+	
+	public void setSecondNum(int secondNum) {
+		this.secondNum = secondNum;
+	}
+}
+--------------------------------------------------------------------------------------------------------------------------------
+ public class MainClass {
+	public static void main(String[] args) {
+		
+		MyCalculator myCalculator = new MyCalculator();
+		myCalculator.setCalculator(new Calculator());
+		
+		myCalculator.setFirstNum(10);
+		myCalculator.setSecondNum(2);
+		
+		myCalculator.add();
+		myCalculator.sub();
+		myCalculator.mul();
+		myCalculator.div();		
+	}
+}
+--------------------------------------------------------------------------------------------------------------------------------
+<?xml version="1.0" encoding="UTF-8"?>
+-<beans xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.springframework.org/schema/beans">
+<bean class="com.superman.ex.Calculator" id="calculator"/>
+	<bean class="com.superman.ex.MyCalculator" id="myCalculator">
+ 		<property name="calculator">
+			<ref bean="calculator"/>
+		</property>
+		<property name="firstNum" value="10"/>
+		<property name="secondNum" value="2"/>
+	</bean>
+</beans>
