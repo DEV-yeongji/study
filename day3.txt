@@ -1,0 +1,46 @@
+2020.12.22
+
+★Spring Bean ?  스프링에서 pojo를 일컫는다.
+빈즈는 애플리케이션 핵심을 이루는 객체, IOC에 의해 인스턴스화,관리,생성된다.
+일반적으로 XML 파일에 정의한다. =>생명주기, DI 등을 알 수 있다.
+class : 정규화된 자바 클래스 이름
+id : bean의 고유 식별자
+scope :  객체의 범위 (singleton이 기본)
+constructor-arg : 생성자에 전달할 인수
+property : setter에 전달할 인수
+init , destroy method....
+
+★Spring Bean Scope
+singleton : 하나의 bean정의에 대해 Spring IOC contatiner 내에 단 하나의 객체만 존재.
+prototype : 하나의 bean정의에 대해 다수의 객체가 존재.
+request : 하나의 bean정의에 대해 하나의 HTTPrequest의 생명주기 안에 단 하나의 객체만 존재.
+session : 하나의 bean정의에 대해 하나의 HTTPsession의 생명주기 안에 단 하나의 객체만 존재.
+global session : 하나의 bean정의에 대해 하나의 globalHTTPsession의 생명주기 안에 단 하나의 객체만 존재.
+
+- singleton은 1개의 객체만 존재하기 때문에 여러개를 생성해도 동일한 것을 참조한다.
+- prototype은 bean의 모든 요청에서 새로운 객체를 생성하는 것을 의미 - 다른 것을 참조한다.
+
+#싱글톤으로 적합한 객체
+1.상태가 없는 공유 객체 - 동기화 비용이 없다.
+2.읽기용으로만 상태를 가진 공유 객체
+3.공유가 필요한 상태를 지닌 공유 객체 - 객체 간의 반드시 공유해야 할 상태를  지녀야 한다.
+4.쓰기가 가능하고 사용빈도가 높은 객체
+
+#비싱글톤으로 적합한 객체
+1.쓰기가 가능한 상태를 지닌 객체 - 동기화 비용이 객체 생성 비용보다 크다면...
+2.상태가 노출되지 않은 객체 
+
+
+#디자인 패턴이란?
+설계자들이 올바른 설계를 빨리 만들 수 있도록 도와주는것.
+기존 환경 내에서 반복적으로 일어나는 문제들을 해결책을 제시해주는 일종의 솔루션
+크게 생성(creational)패턴 / 구조(Structural)패턴 / 행동(Behavioral) 패턴 으로 나뉜다.
+
+
+
+
+
+
+
+참고 블로그 : https://readystory.tistory.com/114 , https://m.blog.naver.com/rosaria1113/222047584290 
+참고 이미지 : 학원수업때 받은 이미지
