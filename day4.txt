@@ -1,0 +1,51 @@
+2020.12.24
+
+★ Ajax ? 전체페이지를 새로 고치지 않고 일부만을 위한 데이터를 로드한다. 비동기 통신.
+Ajax를 이용하면 필요한 데이터만을 웹서버에 요청해서 받은후 처리를 할 수 있기 때문에 데이터 비용이 좋다.
+보통 SOAP이나 XML 기반의 웹 서비스 프로토콜이 사용된다. 
+추가로 Jquery랑 연관된다...=>더 적은 코딩량으로 구현가능..
+
+비동기 통신을 예를들자면... 카페에서 커피주문시 진동벨을 나눠준다 - > 기다리는 동안 다른 것을 해도 된다.
+
+★Ajax의 장점
+- 페이지 이동없이 고속으로 화면 전환
+- 서버 처리를 기다리지 않아도 된다.
+- 수신하는 데이터 양을 줄일 수 있다.
+
+★Ajax의 단점
+- Ajax를 쓸 수 없는 브라우저가 있다..
+- HTTP 클라이언트의 기능이 한정되어 있다.
+- 페이지 이동없는 통신으로 인한 보안상의 문제
+- 요청을 남발하면 역으로 서버 부하가 늘 수있다.
+- 다른 도메인과는 통신이 불가능
++ 배우기가 좀 까다롭다...어렵다....ㅠㅠ
+
+* 오페라 7이하, 익스플로러 4.0 이하 시각장애인을 위한 브라우저 ... 등에서는 지원하지 않는다.
+
+★문법
+$.ajax({
+    type : 'post', // 타입 (get, post, put 등등)
+    url : '/test', // 요청할 서버url
+    async : true, // 비동기화 여부 (default : true)
+    headers : { // Http header
+      "Content-Type" : "application/json",
+      "X-HTTP-Method-Override" : "POST"
+    },
+    dataType : 'text', // 데이터 타입 (html, xml, json, text 등등)
+    data : JSON.stringify({ // 보낼 데이터 (Object , String, Array)
+      "no" : no,
+      "name" : name,
+      "nick" : nick
+    }),
+    success : function(result) { // 결과 성공 콜백함수
+        console.log(result);
+    },
+    error : function(request, status, error) { // 결과 에러 콜백함수
+        console.log(error)
+    }
+})
+
+
+
+출처 위키백과 , https://beam307.github.io/2017/12/05/ajax/
+
