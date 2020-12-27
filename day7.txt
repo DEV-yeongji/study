@@ -1,0 +1,27 @@
+2020.12.27
+
+★ model 객체
+Controller 에서 생성된 데이터를 담아서 view로 전달할 때 사용하는 객체이다.
+서블렛의 request.setAttribute()와 유사하다.
+addAttribute('key','value')메서드를 사용하여 전달할 데이터를 세팅한다.
+받을땐 el문으로 ${key} 이렇게 받으면 된다.
+
+
+서블렛에서 모델2방식으로 데이터를 전달하는 방식
+request.setAttribute('serverTime',new java.util.Data());
+RequestDispatcher dispatcher = request.getRequestDispatcher('/web-inf/jsp/home.jsp');
+dispatcher.forward(request,response);
+
+위의 코드를 스프링으로 바꾸면
+public String home(Model model) {
+	model.addAttribute('serverTime',new java.util.Data());
+	return 'home';
+}
+
+메서드의 피라미터를 model로 선언하면 자동으로 스프링mvc에서 model타입의 객체를 만들어 주기 때문에 개발자의 입장에서는
+필요한 데이터를 담아 주는 작업만으로 모든 작업이 완료된다. model을 사용해야 하는 경우는 주로 Controller에 전달된 데이터를 이용해서
+추가적인 데이터를 가져와야 하는 상황이다.
+
+- 게시판 리스트 페이지번호를 파라미터로 전달받고, 실제데이터를 view로 전달해야 하는 경우
+- 파라미터들에 대한 처리 후 결과를 전달해야 하는 경우
+
