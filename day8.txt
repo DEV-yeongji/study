@@ -1,0 +1,41 @@
+2020.12.28
+
+★ModelAttribute 어노테이션(@)
+
+웹페이지 구조는 Request에 전달된 데이터를 가지고 필요하다면 추가적인 데이터를 생성해서 화면으로 전달하는 방식으로 동작함.  Model의 경우는 파라미터로 전달된 데이터는 존재하지 않지만, 화면에서 필요한 데이터를 전달하기 위해서 사용한다. 예를들어 페이징처리할때, 페이지 번호는 파라미터로 전달되지만,
+결과데이터를 전달하려면 Model에 담아서 전달한다.
+
+스프링 컨트롤러는 자바빈즈 규칙에 맞는 객체는 다시 화면으로 객체를 전달한다. 
+
+자바빈즈 규칙 - 단순히 생성자가 없거나, 생성자를 가져야 하며, getter/setter
+를 가진 클래스의 객체를 의미한다. 
+
+기본자료형의 경우는 파라미터로 선언(매개변수)해도 화면까지 전달하지 않는다. 
+=> ModelAttribute  를 쓰면 전달이 가능하다.
+@ModelAttribute가 걸린 파라미터는 타입에 관계없이 Model에 담아서 전달되므로 페이징처리할때 사용가능하다. 매개변수에 @ModelAttribute("key") _______ 라고 선언하면 된다.
+
+Ex:) @getMapping('/ex04')
+public String ex04(SampleDTO dto, @ModelAttribute('page') int page {
+	log.info("dto : "+dto);
+	log.info("page: "+page);
+	return '/sample/ex04';
+}
+
+★RedirectAttributes 
+Model타입과 더불어서 스프링mvc가 자동으로 전달해 주는 타입이다.
+일회성으로 데이터를 전달하는 용도이며, servlet에서의 response.sendRedirect() 와 동일하다.
+
+ex:) response.sendRedirect('/home?name=aaa&age=75');
+			↓
+rttr.addFlashAttribute('name','aaa');
+	rttr.addFlashAttribute('age',75);
+	return 'redirect:/';
+
+RedirectAttributes는 model과 같이 파라미터로 선언해서 사용하고. addFlashAttribute는(key,value) 메소드를 이용해서 화면에 한번만 사용하고 다음에는 사용되지 않는 데이터를 전달하기 위해 사용한다.
+
+★Model and View ?
+사실 안써도 무방하다, 단 오버로딩을 할때는 필요하다.
+예를들어 url을 맵핑할때, 메소드 이름이 같고 매개변수가 다른것을 오버로딩이라고 하는데,, 두개의 메소드 에서 하나는 get, 하나는 post 라고 가정하자.
+각각의 매개변수로 request, model | request만 받는다면? 그런데
+request만 받는애가 모델 데이터로 받고 싶다면? 그럴때 모델앤뷰를 사용하면된다.
+
