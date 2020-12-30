@@ -1,0 +1,86 @@
+2020.12.30
+
+Mybatis 기본문법
+
+▷▷변수설정 
+#{}
+
+▷▷select 기본 
+<select id="" parameterType="" resultType="">
+	select * from TABLE_NAME where a = #{}
+</select>
+
+▷▷if문 (null 체크시 많이 사용)
+<select id="" resultType="">
+	select * from TABLE_NAME where a = '   '
+	<if test="b != null">
+		and b like #{b}
+	</if>
+</select>
+
+▷▷choose, when, otherwise 검색방법을 달리할때 처럼..
+<select id="" resultType="">
+	select * from TABLE_NAME where a = '  '
+	<choose>
+		 <when test="b !=null">
+			and b like #{b}
+		</when>
+		<when test="c !=null and c.name !=null">
+			and c_name like #{c.name}
+		</when>
+		<otherwise>
+			and d = 1
+		<otherwise>
+	</choose>
+</select>
+
+▷▷insert, update, delete
+<insert id="">
+	insert into TABLE_NAME (id,name,email)
+	values (#{id},#{name},#{email})
+</insert>
+
+<update id="">
+	update TABLE_NAME set id=#{id}, 
+	name =#{name}, email=#{email} where no = #{no}
+<update>
+
+<delete id="">	
+	delete from TABLE_NAME where no = #{no}
+</delete>
+
+
+☆parameterType : 전달될 매개변수의 패키지 경로를 포함한 클래스명이나 별칭
+☆resultType : 결과데이터가 저장되는 곳.. (패키지경로를 포함한 클래스나 별칭)
+☆flushCache : 기본값은 false. / true일 경우 구문히 호출될 때마다 로컬, 2레벨 캐시가 삭제
+☆useCache : 기본값은 true / true일 경우 구문의 결과가 2레벨 캐시로 저장됨.
+☆timeout : 에외가 던져지기 전에 db의 요청 결과를 기다리는 최대시간을 설정한다.
+☆fetchSize : 지정된 수만큼의 결과를 리턴하도록 하는 드라이버 힌트 형태의 값이다.
+☆statementType : mybatis에서 스테이먼트 타입을 지정한다. 기본값은 prepared이다.
+☆useGeneratedKeys : insert.update만 적용 / 유
+
+
+출처 : https://mybatis.org/mybatis-3/ko/sqlmap-xml.html
+
+파일업로드 복습하기!
+
+★ File upload
+entype 전송되는 파라미터 형식을 알려준다. 원래는 작성을 하지않지만, 파일업로드 구현시 꼭 form태그에 명시.
+ 또한 post타입으로 해야한다. entype = multipart/form-data
+바이트 타입으로 받아진다. 만약 10M를 원할시 int size = 1024 * 1024* 10 ;
+ex:)
+try {
+	MultipartRequest mulit = new MultipartRequest(request,폴더위치,size,'utf-8',DefaultFileRenamePolicy());
+	Enumeration files = multi.getFileNames();	// form 요소중 태그가 file로 된 이름을 반환한다.
+	while(files.hasMoreElements()) {
+		String str = (String) files.nextElement();
+		file = multi.getFileSystemName(str);	// 중복이 있을시 중복 후의 이름을 반환한다.
+		orfile - multi.getOriginalFileName(str);	// 중복이 있을시 중복 전의 이름을 반환한다.
+	}
+}cathc(---------------------------------------){
+}
+
+// MultipartRequest는 cos.jar에서 사용하는 클래스 이다.
+// DefaultFileRenamePolicy는 만약 같은 이름이있을시 새로운 이름을 주게끔 처리한다.
+
+
