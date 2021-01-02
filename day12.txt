@@ -1,0 +1,67 @@
+2021.01.02
+
+알고리즘 복습 
+
+* while문은 실행전에 반복을 계속할지를 판단한다. = > 사전 판단 반복 구조
+* 하나의 변수를 사용하는 반복문은 while문보다 for문을 사용하는 것이 좋다.
+* do문은 일단 한 번 실행후 계속 반복할 것인지 판단한다. = > 사후 판단 반복 구조
+
+사전 판단 반복문인 while, for 문은 처음에 제어식을 평가한 결과가 0이면 루프 본문은
+한번도 실행하지 않는다. 하지만 do문은 루프 본문이 반드시 한번 실행 한다.
+
+★ 드모르간 법칙
+no < 10 || no > 99 를 !을 사용하여 수정하면 !(no>=10 && no<=99)가 된다.
+각 조건을 부정하고 논리곱(&&)을 논리합(||)으로, 논리합(||)을 논리곱(&&)으로 바꾸고 다시 전체를 부정하면
+원래의 조건과 같다 는 법칙을 드모르간의 법칙 이라고 한다.
+1. x && y 와 !(!x || !y)는 같다.
+2. x || y 와 !(!x&&!y)는 같다.
+
+★다중 루프 (for문)
+바깥쪽의 for문은 세로방향(행루프)에 대한 반복이다. 안쪽의 for문은 가로방향(열루프)에 대한 반복이다.
+예제) 직각 이등변 삼각형 출력
+import java.util.Scanner;
+public class Triangle {
+	public static void main(String[] args) {
+		Scanner sc = new Scanner(System.in);
+		int n;
+		for(int i=1;i<=n;i++){
+			for(int j=1;j<=i;j++){
+				System.out.print("*");
+			}
+			System.out.println("");
+		}
+	}
+}
+예제2) 숫자 피라미드
+class NumPira_01_17 {
+	static void npira(int n) {
+		for (int i = 1; i <= n; i++) { 				// i행 (i = 1, 2, … ,n)
+			for (int j = 1; j <= n - i + 1; j++) 		// n-i+1개의 ' '를 나타냄
+				System.out.print(' ');
+			for (int j = 1; j <= (i - 1) * 2 + 1; j++) 		// (i-1)*2+1개의 '*'를 나타냄
+				System.out.print(i % 10);
+			System.out.println(); 			
+		}
+	}
+
+	public static void main(String[] args) {
+		Scanner stdIn = new Scanner(System.in);
+		int n;
+
+		System.out.println("피라미드 모양으로 나타냅니다.");
+
+		do {
+			System.out.print("단수는 ：");
+			n = stdIn.nextInt();
+		} while (n <= 0);
+
+		npira(n); // 피라미드를 나타냄
+	}
+}
+
+★자료구조
+데이터 단위와 데이터 자체 사이의 물리적 또는 논리적인 관계
+
+* 데이터 단위는 데이터를 구성하는 한 덩어리. 자료구조는 자료를 효율적으로 이용할 수 있도록
+컴퓨터에 저장하는 방법을 말한다..
+
