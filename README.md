@@ -1,5 +1,5 @@
 # TextFile study
-### 1day 1study
+### yeongji study
 
 > 참고서적 
 >	> [ 코드로 배우는 스프링 웹 프로젝트 개정판 ](https://book.naver.com/bookdb/book_detail.nhn?bid=13993776,"스프링책")   
