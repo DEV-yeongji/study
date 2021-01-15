@@ -1,0 +1,133 @@
+2020.01.15
+
+★스택
+스택은 데이토룰 일시적으로 저장하기 위해 사용하는 자료구조로, 데이터의 입력과 출력순서는
+후입선출(LIFO Last in First Out) 이다. 가장 나중에 넣은 데이터를 가장 먼저 꺼낸다. 스택에 데이터를 넣는 작업을 푸시라고하고, 스택에서 데이터를 꺼내는 작업을 팝이라고 한다. 푸시와 팝을 하는 위치를 꼭대기(탑) 이라하고 스택의 가장 아래부분을 바닥(바텀) 이라고
+한다...
+자바 프로그램에서 메서드를 호출하고 실행할때 프로그램 내부에서는 스택을 사용한다.
+
+스택 만들기 예제 
+
+public class IntStack {
+	private int max;			// 스택 용량
+	private int ptr;			// 스택 포인터
+	private int[] stk;			// 스택 본체
+
+	// 실행 시 예외 : 스택이 비어 있음
+	public class EmptyIntStackException extends RuntimeException {
+		public EmptyIntStackException() { }
+	}
+
+	// 실행 시 예외 : 스택이 가득 참
+	public class OverflowIntStackException extends RuntimeException {
+		public OverflowIntStackException() { }
+	}
+
+	// 생성자
+	public IntStack(int capacity) {
+		ptr = 0;
+		max = capacity;
+		try {
+			stk = new int[max];				// 스택 본체용 배열을  생성
+		} catch (OutOfMemoryError e) {		// 생성할 수 없음
+			max = 0;
+		}
+	}
+
+	// 스택에 x를 푸시
+	public int push(int x) throws OverflowIntStackException {
+		if (ptr >= max)									// 스택이 가득 참
+			throw new OverflowIntStackException();
+		return stk[ptr++] = x;
+	}
+
+	// 스택에서 데이터를 팝(정상에 있는 데이터를 꺼냄)
+	public int pop() throws EmptyIntStackException {
+		if (ptr <= 0)									// 스택이 비어 있음
+			throw new EmptyIntStackException();
+		return stk[--ptr];
+	}
+
+	// 스택에서 데이터를 피크(정상에 있는 데이터를 들여다봄) 
+	public int peek() throws EmptyIntStackException {
+		if (ptr <= 0)									// 스택이 비어 있음
+			throw new EmptyIntStackException();
+		return stk[ptr - 1];
+	}
+
+	// 스택에서 x를 찾아 인덱스(없으면 –1)를 반환 
+	public int indexOf(int x) {
+		for (int i = ptr - 1; i >= 0; i--)				// 정상 쪽에서 선형 검색
+			if (stk[i] == x)
+				return i;								// 검색 성공
+		return -1;										// 검색 실패
+	}
+
+	// 스택을 비움
+	public void clear() {
+		ptr = 0;
+	}
+
+	// 스택의 용량을 반환
+	public int capacity() {
+		return max;
+	}
+
+	// 스택에 쌓여 있는 데이터 수를 반환
+	public int size() {
+		return ptr;
+	}
+
+	// 스택이 비어 있는가?
+	public boolean isEmpty() {
+		return ptr <= 0;
+	}
+
+	// 스택이 가득 찼는가?
+	public boolean isFull() {
+		return ptr >= max;
+	}
+
+	// 스택 안의 모든 데이터를 바닥 → 꼭대기 순서로 출력
+	public void dump() {
+		if (ptr <= 0)
+			System.out.println("스택이 비어 있습니다.");
+		else {
+			for (int i = 0; i < ptr; i++)
+				System.out.print(stk[i] + " ");
+			System.out.println();
+		}
+	}
+}
+
+★ Rest 한번더 공부..
+Rest : 자원을 이름으로 구분해 자원의 상태를 주고 받는 것
+자원의 표현이란? 이름을 명시적으로 정하는 것..
+상태란? 정보를 전달하는것... 주로 JSON과 XML을 통해 주고받는다. TEXT,RSS 등도 가능
+웹 기술인 HTTP프로토콜을 그대로 활용하기 떄문에 웹의 장점을 최대한 활용할 수 있다.
+HTTP URI 를 통해 자원을 명시하고, HTTP메소드 를 통해 해당 자원에 대한 CRUD를 적용함.
+메소드 : POST, GET, PUT, DELETE
+
+웹사이트의 모든 자원에 고유한 ID인 HTTP URI를 부여함.
+다음과 같은 규칙을 갖는다.(보통은 그렇게 잘 안지켜지는 경우도 있다)
+
+POST => Create (생성)
+
+GET => Read (조회)
+
+PUT => Update (수정)
+
+DELETE => Delete (삭제)
+
+1. 서버와 클라이언트의 구조이다.
+자원이 있는 쪽이 서버, 요청하는 쪽이 클라이언트
+2.의존성이 줄어든다.
+3. 클라이언트의 context를 서버에 저장하지 않는다.
+이전요청과 다음요청 처리에 연광성이 없다.
+4. 캐시처리가능
+5. 다중 계층으로 구성될 수 있다 프록시, 게이트 웨이 같은 네트워크 기반 중간 매체를 사용할 수 있다.
+클라이언트가 알수없게 적용가능하다
+
+REST API는 구분자를 '/'로 계층관계를 나타내는데 사용한다.
+
+[출처] https://blog.naver.com/varkiry05/221924011106
