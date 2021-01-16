@@ -1,0 +1,174 @@
+2020.01.16
+
+☆연산자
+산술연산자 : + - * / % << >> (나머지 연산은 %, 나누기는 / 헷갈리지말기)
+비교연산자 : > < >= <= == !=
+논리연산자 : && || ! & | ^ ~ (비트연산자는 & | ^ ~ )
+대입연산자 : = 
+기타 : (type) ?: instanceOf 
+
+연산자의 우선순위와 결합규칙
+식에 사용된 연산자가 둘 이상인 경우 연산자의 우선순위에 의해서 연산순서가 결정된다. 곱셉과 나눗셈은
+덧셈과 뺄셈보다 우선순위가 높다는 것은 수학이랑 똑같다.
+쉬프트연산자(<< , >>)는 덧셈연산자보다 우선순위가 낮다.
+비트연산자는(&,|,^,~)는 비교연산자보다 우선순위가 낮다. 그래서 비교후에 비트연산이 이루어진다.
+논리연산자 AND가 OR보다 우선순위가 높다.. 그래서 함께 사용되는 경우 괄호를 이용하여 우선순위를 명확히 한다.
+
+*형변환시 더 큰 타입으로 일치시키는데 그 이유는 작은타입으로 형변환 하면 원래의 갑이 손실될 가능성이 있기 때문이다.
+작은 타입에서 큰 타입으로 형변환 하는 경우, 자동적으로 형변환 되므로 형변환 연산자를 생략할 수 있다.
+자동 형변환 되는 것을 산술변환이라고 한다. 하지만 쉬프트연산자와 증감연산자는 예외이다.
+
+* 유니코드
+문자 0 코드 48	문자 A 코드 65	문자 a 코드 97
+문자 1 코드 49	문자 B 코드 66	문자 b 코드 98
+문자 2 코드 50	문자 C 코드 67	문자 c 코드 99
+문자 3 코드 51	문자 D 코드 68	문자 d 코드 100
+문자 4 코드 52	문자 E 코드 69	문자 e 코드 101
+문자 5 코드 53	문자 F 코드 70	문자 f 코드 102
+문자 6 코드 54	  .   .    .   .   .	  .  .   .   .   .
+문자 7 코드 55	문자 X 코드 88	문자 x 코드 120
+문자 8 코드 56	문자 Y 코드 89	문자 y 코드 121
+문자 9 코드 57	문자 Z 코드 90	문자 z 코드 122
+
+예시
+class OperatorEx {
+	public static void main(String[] args) {
+		char c1 = 'a';
+		char c2 = c1;
+		char c3 = ' '; 	// 공백
+		int i = c1 +1 ;
+		c3 = (char)(c1 +1); 	//덧셈 연산 결과가 int이므로 char변수에 담기위해서 형변환!
+		c2++;
+		c2++;
+		System.out.println("i=" + i);
+		System.out.println("c2=" + c2);
+		System.out.println("c3=" + c3);
+	}
+}
+결과 : i = 98 , c2 = c, c3 = b
+c2는 형변환 없이 c2에 저장되어 있는 값을 1씩 증가시키므로 예제에서는 원래 저장되어 있던 값인 97이
+1씩 두 번 증가되어 99가 된다. 코드값이 10진수로 99인 문자는 c 이므로 c가 출력되는 것..
+
+★큐
+컴퓨터의 기본적인 자료구조의 한가지로, 먼저 집어 넣은 데이터가 먼저나오는 First In First Out 구조이다.
+보통의 배열을 사용해서 큐를 구현하면 앞으로 밀려나는 문제가 생겨난다. 앞쪽은 채워지고 뒤쪽은 빠지기 떄문에,,
+이를 해결하기 위해 원형 버퍼를 사용한다. 시작부분과 끝 부분을 포인터로 지정한뒤 Enqueue , Deqyeye를 하는 형태. 
+대신 가득찰 때와 비어있을 떄 포인터가 같은 위치를 지정하기 때문에 이를 해결하기 위해 한 공간을 비워놓는다.
+연결리스트를 사용하면 배열에 비해 매우 쉽게 구현이 가능하다..
+어떠한 작업//데이터를 순서대로 실행 사용하기 위해 대기 시킬때 사용한다.!!
+		
+	
+큐 예제
+
+public class IntQueue_04_05 {
+	private int max; // 큐의 용량
+	private int front; // 맨 앞 커서
+	private int rear; // 맨 뒤 커서
+	private int num; // 현재의 데이터 수
+	private int[] que; // 큐의 본체
+
+	// 실행할 때 예외：큐가 비어 있음
+	public class EmptyIntQueueException extends RuntimeException {
+		public EmptyIntQueueException() {
+		}
+	}
+
+	// 실행할 때 예외：큐가 가득 참
+	public class OverflowIntQueueException extends RuntimeException {
+		public OverflowIntQueueException() {
+		}
+	}
+
+	// 생성자
+	public IntQueue_04_05(int capacity) {
+		num = front = rear = 0;
+		max = capacity;
+		try {
+			que = new int[max]; // 큐 본체용 배열을 생성
+		} catch (OutOfMemoryError e) { // 생성할 수 없습니다.
+			max = 0;
+		}
+	}
+
+	// 큐에 데이터를 인큐
+	public int enque(int x) throws OverflowIntQueueException {
+		if (num >= max)
+			throw new OverflowIntQueueException(); // 큐가 가득 참
+		que[rear++] = x;
+		num++;
+		if (rear == max)
+			rear = 0;
+		return x;
+	}
+
+	// 큐에서 데이터를 디큐
+	public int deque() throws EmptyIntQueueException {
+		if (num <= 0)
+			throw new EmptyIntQueueException(); // 큐가 비어 있음
+		int x = que[front++];
+		num--;
+		if (front == max)
+			front = 0;
+		return x;
+	}
+
+	// 큐에서 데이터를 피크(머리데이터를 살펴봄)
+	public int peek() throws EmptyIntQueueException {
+		if (num <= 0)
+			throw new EmptyIntQueueException(); // 큐가 비어 있음
+		return que[front];
+	}
+
+	// 큐에서 x를 검색하여 index(찾지 못하면 -1)를 반환
+	public int indexOf(int x) {
+		for (int i = 0; i < num; i++) {
+			int idx = (i + front) % max;
+			if (que[idx] == x) // 검색성공
+				return idx;
+		}
+		return -1; // 검색실패
+	}
+
+	// 큐를 비움
+	public void clear() {
+		num = front = rear = 0;
+	}
+
+	// 큐의 용량을 반환
+	public int capacity() {
+		return max;
+	}
+
+	// 큐에 쌓인 데이터 수를 반환
+	public int size() {
+		return num;
+	}
+
+	// 큐가 비어 있는가?
+	public boolean isEmpty() {
+		return num <= 0;
+	}
+
+	// 큐가 가득 찼는가?
+	public boolean isFull() {
+		return num >= max;
+	}
+
+	// 큐 안의 터(이터를 머리→꼬리의 차례로 나타냄
+	public void dump() {
+		if (num <= 0)
+			System.out.println("큐가 비었습니다.");
+		else {
+			for (int i = 0; i < num; i++)
+				System.out.print(que[(i + front) % max] + " ");
+			System.out.println();
+		}
+	}
+	// 큐에서 x를 검색하여 머리부터 몇 번 째인가(찾지 못하면 0)를 반환
+	public int search(int x) {
+		for (int i = 0; i < num; i++)
+			if (que[(i + front) % max] == x) // 검색성공
+				return i + 1;
+		return 0; // 검색실패
+	}
+}
