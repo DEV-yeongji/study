@@ -1,0 +1,180 @@
+202.01.21
+
+★JDBC-Template
+전통방식으로 구현하는 JDBC로직을 2~3줄로 처리할 수 있는 Spring API 이다.
+update문 같은 경우에는 쿼리문을 포함하여 단 2줄로 처리할 수도 있다.
+자원을 내부적으로 생성하고 해제함으로써 전통방식의 JDBC코드구현을 단순화 시킨다. Connection, PrepareStatement,ResultSet 들을
+사용하고 알아서 내부적으로 처리해준다.(닫아주는 처리)
+
+★Autowired
+이 어노테이션을 부여하면 ( @Autowired ) 각 상황의 타입에 맞는 IOC컨테이너 안에 존재하는 Bean을 자동으로 주입 해 준다.
+필요한 의존 객체의 '타입' 에 해당하는 빈을 찾아 주입 한다고 생각하면 된다.
+- 생성자 - setter - 필드
+위의 3가지의 경우에 Autowired를 사용할 수 있다. 그리고 Autowired는 기본값이 true이기 때문에 의존성 주입을 할 대상을 찾지 못한다면,
+에러가 발생한다..
+
+☆어노테이션 만으로 의존성 주입이 가능한 이유..
+BeanPostProcessor라는 라이프 사이클 인터페이스의 구현체인 AutowiredAnnotationBeanPostProcessor에 의해 의존성 주입이 이루어진다.
+BeanPostprocessor는 빈의 초기화 라이프 사이클 이전, 이후에 필요한 부가 작업을 할 수 있는 라이프 사이클 콜백이다. 그리고
+BeanPostProcessor의 구현체인 AutowiredAnnotationBeanPostProcessor가 빈의 초기화 라이프 사이클 이전, 즉 빈이 생성되기 전에
+@Autowired가 붙어있으면 해당하는 빈을 찾아서 주입해 주는 작업을 하는 것이다..
+
+아무튼 쉽게말해 JDBC-Template 메소드를 쓸 수 있는 이유는 @Autowired로 인한 의존성 주입을 했기 때문이다..
+각 메서드 들읜 template객체로부터 나오는데 이 객체는 @Autowired로 선언한 JDBC-Template 클래스의 객체이다. DAO클래스는 쿼리문을
+수행하기 위해 JDBC-Template에 의존적이게 되는 것이다..
+
+Mybatis랑 Spring JDBC-Template이랑 비교가 많이 되는데... Mybatis는 학습이 까다롭다고 생각한다..
+초보개발자인 나는 뭐가 더 좋은지 어떤 것을 써야 효율적인지 잘 모르는데 친절하신분이 Mybatis대비 SpringJDBC의 장점을 기술해놨다..
+출처 : https://github.com/benelog/spring-jdbc-tips/blob/master/framework-compare.md
+* Mybatis 대비 Spring JDBC의 장점
+- 초기 설정이 단순하다. 
+- 쿼리 결과를 변환하는 구성요소가 인터페이스로 정의되어 java컴파일러의 장점을 활용할 수 있다.
+- Collection 파라미터를 더 편하게 사용할 수 있다.
+- 학습 비용은 낮고 생산성은 높다.
+
+다음 예제는 학원에서 받은 JDBC-Template을 이용한 게시판 소스 인데 DAO 부분을 주석을 달았다.
+public class BDao {
+
+	DataSource dataSource;
+	
+	JdbcTemplate template = null;  //Constant 의 template참조
+	
+	public BDao() {		//싱글텀패턴으로 바꿔보자
+		template = Constant.template;
+	}
+	
+	public BDto contentView(String strID) {
+		
+		upHit(strID);
+		String query = "select * from mvc_board where bId = " + strID;
+		return template.queryForObject(query, new BeanPropertyRowMapper<BDto>(BDto.class));
+		//queryForObject 는 반환형이 객체임(dto)
+		
+	}
+	
+	public int getCurrentNo()		//바꿔야한당..
+	{
+		String query = "SELECT AUTO_INCREMENT FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA='test2' AND TABLE_NAME='mvc_board'";
+		return template.queryForObject(query, Integer.class);
+	}
+
+	
+	public void write(final String bName, final String bTitle, final String bContent){
+		template.update(new PreparedStatementCreator() {
+			@Override
+			public PreparedStatement createPreparedStatement(Connection con)
+					throws SQLException {
+				int bGroup = getCurrentNo();
+				String query = "insert into mvc_board (bName, bTitle, bContent, bHit, bGroup, bStep, bIndent) values (?, ?, ?, 0, ?, 0, 0)";
+				PreparedStatement pstmt = con.prepareStatement(query);
+				pstmt.setString(1, bName);
+				pstmt.setString(2, bTitle);
+				pstmt.setString(3, bContent);
+				pstmt.setInt(4, bGroup);
+				
+				return pstmt;
+			}
+		});
+	} //매개변수가 final인 이유는 이름없는 클래스를 만들었는데 참조를 하려면 final로 임시저장해주는거. 지역변수는 원래는 소멸되기때문에
+	
+	
+	public ArrayList<BDto> list() {
+		String query = "select bId, bName, bTitle, bContent, bDate, bHit, bGroup, bStep, bIndent from mvc_board order by bGroup desc, bStep asc";
+		return (ArrayList<BDto>) template.query(query, new BeanPropertyRowMapper<BDto>(BDto.class));
+	}  //하나씩 저장한 것을 반환해줌 리턴형이 그냥 list임.
+	
+	public void modify(final String bId, final String  bName, final String  bTitle, final String  bContent) {
+		String query = "update mvc_board set bName = ?, bTitle = ?, bContent = ? where bId = ?";
+		template.update(query, new PreparedStatementSetter() {
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setString(1, bName);
+				ps.setString(2, bTitle);
+				ps.setString(3, bContent);
+				ps.setInt(4, Integer.parseInt(bId));
+			}
+		});
+	} //set해줘야하니까 setValues를 오버로딩.
+	
+	public void delete( final String strID) {
+		
+		String query = "delete from mvc_board where bId = ?";
+		template.update(query, new PreparedStatementSetter() {
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setString(1, strID);
+			}
+		});  //modify랑 형태가 같다.
+		
+	}
+	
+	public BDto reply_view(String strID) {
+		
+		String query = "select * from mvc_board where bId = " + strID;
+		return template.queryForObject(query, new BeanPropertyRowMapper<BDto>(BDto.class));
+		
+	} //답변한 뷰페이지기때문에 (dto)객체를 반환함. 그래서 queryFOrObject쓴거임.
+	
+	public void reply(final String bId, final String bName, final String bTitle, final String bContent, final String bGroup, final String bStep, final String bIndent) {
+		
+		String query = "insert into mvc_board (bName, bTitle, bContent, bGroup, bStep, bIndent) values (?, ?, ?, ? ,? ,?)";
+		replyShape(bGroup, bStep);  //stepup 설정
+		template.update(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setString(1, bName);
+				ps.setString(2, bTitle);
+				ps.setString(3, bContent);
+				ps.setInt(4, Integer.parseInt(bGroup));
+				ps.setInt(5, Integer.parseInt(bStep) + 1);
+				ps.setInt(6, Integer.parseInt(bIndent) + 1);
+			}
+		});
+	}
+	
+	private void replyShape( final String strGroup, final String strStep) {
+		
+		String query = "update mvc_board set bStep = bStep + 1 where bGroup = ? and bStep > ?";
+		template.update(query, new PreparedStatementSetter() {
+			
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setInt(1, Integer.parseInt(strGroup));
+				ps.setInt(2, Integer.parseInt(strStep));
+			}
+		}); //답변을위해 stepup설정하고 역시 변화하기때문에 update를 썻당
+	}
+	
+	private void upHit( final String bId) {
+		String query = "update mvc_board set bHit = bHit + 1 where bId = ?";
+		template.update(query, new PreparedStatementSetter() {
+			@Override
+			public void setValues(PreparedStatement ps) throws SQLException {
+				ps.setInt(1, Integer.parseInt(bId));
+			}
+		});
+	}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+출처 : https://u-it.tistory.com/31?category=908594 ,https://devlog-wjdrbs96.tistory.com/166
