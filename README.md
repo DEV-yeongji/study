@@ -8,7 +8,8 @@
 > > [ Head First SQL ](https://book.naver.com/bookdb/book_detail.nhn?bid=4532339,"sql책")      
 
 > 참고
-> > [생활코딩](https://opentutorials.org/course/1, "생활코딩") , 기타 네이버 블로그, 티스토리 블로그 (본문에 출처기재)        
+> > [생활코딩](https://opentutorials.org/course/1, "생활코딩") , [뉴렉처](https://www.youtube.com/watch?v=XtXHIDnzS9c&list=PLq8wAnVUcTFUHYMzoV2RoFoY2HDTKru3T&index=1)         
+> > 기타 네이버 블로그, 티스토리 블로그 (본문에 출처기재)        
 > > 학원에서 받은 수업자료!            
 > > >도움을 얻고 꼭 본문에 출처를 표기하고 있습니다 감사합니다 :)
 
@@ -40,5 +41,6 @@
 | 24차수 | 2021.01.19 | JDBC템플릿 |
 | 25차수 | 2021.01.21 | JDBC템플릿과 게시판 소스 |
 | 26차수 | 2021.01.22 | JSON기초와 XML파싱예제 |
+| 27차수 | 2021.01.23 | @Autowired의 위치와 @Component |
 * 많이 부족하다고 생각하는 restful 과 배열 , 자료구조 등은 반복적으로 공부하기..
 * 수시로 몇번씩 반복-복습!!
