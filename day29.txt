@@ -1,0 +1,83 @@
+21.01.27
+
+☆AOP
+사용자 관점이 아닌 별개의 관점에서 코드 넣기
+크로스컷팅 - 앞뒤로 소스코드 넣기 그리고 스프링이랑 같이 사용할시 코드변경과 수정이 문제되는데 Spring DI로 해결하면된다.
+
+AOP용어
+- JoinPoint
+Advice를 적용 가능한 지점을 의미한다. 메소드호출, 필드값 변경 등이 JoinPoint에 해당한다.
+-PointCut
+JoinPoint의 부분집합으로서 실제로 Advice가 적용되는 JoinPoint를 나타낸다.
+-Advice
+언제 공통 관심 기능을 핵심 로직에 적용할 지를 정의하고 있다. 
+-Weaving
+Advice를 핵심로직코드에 적용하는 것을 Weaving이라고 한다
+-Aspect
+여러 객체에 공통으로 적용되는 기능 . 트랜잭션이나 , 보안등이 좋은 예 이다.
+
+3가지 Weaving 방식
+1.컴파일시 2.클래스 로딩 시 3. 런타임
+런타임시에 Weaving하는 방식은 Spring-AOP에서 사용하는 방식인데 소스코드나 클래스 정보자체를 변경하지 않는다. 프록시를 생성하여
+AOP를 적용한다. 프록시 기반의 AOP는 핵심 로직을 구현할 객체에 직접 접근하는 것이 아니라 중간에 프록시를 생성하여 프록시를 통해
+핵심 로직의 객체에 접근하는 것이다.
+스프링은 자체적으로 프록시 기반의 AOP를 지원하고 있다. 따라서 메서드 호출 JoinPoint만을 지원한다.. 필드 값 변경같은 것을 사용하고 싶다면
+AOP프레임워크를 사용해야 한다.
+
+호출부                   ->            Proxy                       ->           Target
+(클라이언트)		    (대행)			       (핵심기능)
+
+- 어드바이스 종류
+<aop:before> : 메소드 실행 전에 advice실행
+<aop:after-returning> : 정상적으로 메소드 실행 후에 advice실행
+<aop:after-throwing> : 메소드 실행중 exception 발생시 advice실행
+<aop:after> : 메소드 실행중 exception 이 발생하여도 advice실행
+<aop:around> : 메서드 실행 전/후 및 exception 발생시 advice실행
+
+*메소드 시그니처
+컴파일러는 메소드의 이름과 파라미터를 이용하여 메소드를 구분한다. 따라서, 메소드의 이름과 파라미터를 메소드의 시그니쳐 라고 한다..
+메소드의 이름은 같지만 파라미터의 개수와 타입이 다를때?(오버로딩) 다른 메소드로 인식한다..
+오버로딩의 특성과 마찬가지로 리턴타입은 메소드 시그니처에 포함되지 않는다.
+
+* POJO
+Plain Old Java Object , 간단히 POJO는 말 그대로 해석을 하면 오래된 방식의 간단한 자바 오브젝트라는 말로서 JAVA EE등의 중량 프레임워크
+들을 사용하게 되면서 해당 프레임워크에 종속된 무거운 객체를 만들게 된 것에 반발해서 사용하게 된 용어..
+이후에 주로 특정 자바 모델이나 기능, 프레임워크 등을 따르지 않은 자바 오브젝트를 지칭하는 말로 사용됨 . 스프링 프레임워크는 POJO방식
+
+
+소스예제 (XML방식)
+<!-- AOP -->
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjweaver</artifactId>
+			<version>1.7.4</version>
+		</dependency>
+
+<bean class="com.superman.ex.LogAop" id="logAop"/>
+<aop:config>
+	<aop:aspect id="logger" ref="logAop">
+		<aop:pointcut id="publicAround" expression="within(com.superman.ex.*)"/>
+		<aop:around method="loggerAop" pointcut-ref="publicAround"/>
+<!-- 실행되는 시점이 around 타겟메소드 전 후 대상은 pointCut에 명시 실행하는 메서드는 loggerAop-->
+	</aop:aspect>
+	<aop:aspect id="logger2" ref="logAop">
+		<aop:pointcut id="publicBefore" expression="within(com.superman.ex.*)"/>
+		<aop:before method="beforeAdvice" pointcut-ref="publicBefore"/>
+<!-- 실행되는 시점이 before 타겟메소드 전 대상은 pointCut에 명시 실행하는 메서드는 beforeAdvice -->
+	</aop:aspect>
+	<aop:aspect id="logger3" ref="logAop">
+		<aop:pointcut id="publicAfterReturning" expression="within(com.superman.ex.*)"/>
+		<aop:after-returning method="afterReturningAdvice" pointcut-ref="publicAfterReturning"/>
+<!-- 실행되는 시점이 정상적으로리턴까지(예외발생시 실행x) 마쳤을때 타겟메소드 후 대상은 pointCut에 명시 실행하는 메서드는 afterReturningAdvice-->
+	</aop:aspect>
+	<aop:aspect id="logger4" ref="logAop">
+		<aop:pointcut id="publicAfterThrowing" expression="within(com.superman.ex.*)"/>
+		<aop:after-throwing method="afterThrowingAdvice" pointcut-ref="publicAfterThrowing"/>
+<!-- 실행되는 시점이예외가 발생한 후에 대상은 pointCut에 명시 실행하는 메서드는 afterThrowingAdvice-->
+	</aop:aspect>
+	<aop:aspect id="logger5" ref="logAop">
+		<aop:pointcut id="publicAfter" expression="within(com.superman.ex.*)"/>
+		<aop:after method="afterAdvice" pointcut-ref="publicAfter"/>
+<!-- 실행되는 시점이 무조건실행.(예외발생해도 실행함) 타겟메소드 후 대상은 pointCut에 명시 실행하는 메서드는 afterAdvice-->
+	</aop:aspect>
+</aop:config>
