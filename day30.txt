@@ -1,0 +1,174 @@
+2021.01.29
+
+★스프링MVC 복습1
+기존 JSP : 컨트롤러에 해당하는 부분을 서블릿 , jsp는 뷰(템플릿) 디스패쳐를 이용하여 포워딩
+스프링은 POJO라서 컨트롤러부분을 일반 자바클래스로 만듬.. 컨트롤러가 빠진 디스패처 기능은 1개만 냅둔다 => 사용자 요청이오면 컨트롤러
+디스패처는 사용자 요청을 받는다는건 입력값이있으면 포장해줄수도 있다는 의미.. 스프링에서 dispatcher만들어준다
+(종속성 문제 야기한다..) mvc를 지원하기 위해 라이브러리가 따로 있다. 
+
+
+* 복습  자바스크립트로 달력만들기
+var calendar = { curYear:0, curMonth:0, curDate:1, theDayOfTheWeek:0, lastDay:0, numOfWeeks:0};
+/*
+	curYear = 달력의 년도를 설정.
+	curMonth = 달력의 월을 설정.
+	curDate = 달력의 일자를 설정.
+	theDayOfTheWeek = 매달 첫번째 날의 요일을 설정.
+	lastDay = 달력의 마지막 날을 설정.
+	numOfWeek = 그 달의 주의 갯수를 설정.
+*/
+
+var month = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER", "NOVEMBER", "DECEMBER"];
+/*
+	month 라는 배열안에 1월 ~ 12월을 넣어준다.
+*/
+
+
+function showCalendar() // 설정된 달력을 보여주는 function
+{
+    var numOfWeek = 0, day=1, i=0, j=0, cnt=0;
+    var dateText = "";
+	// 달력을 채울 공간
+    var curMonth = 0, curYear = 0;
+    getCalendar();
+    curMonth = new Date().getMonth(); // 보여지는 달력의 월을 설정해준다.
+    curYear = new Date().getFullYear(); // 보여지는 달력의 년도를 설정해준다.
+    dateText += "<div class = 'month'>";	// month 라는 공간을 만들어준다
+    dateText += "<ul>";
+    dateText += "<li class='prev'><a href='#' onclick='nextMonth(-1)'>&#10094;</a></li>";
+	// prev 좌표를 누르면 nextMonth() 라는 function안에 -1이 들어간다.
+
+    dateText += "<li class='next'><a href='#' onclick='nextMonth(1)'>&#10095;</a></li>";
+	// next 좌표를 누르면 nextMonth() 라는 function안에 1이 들어간다.
+
+    dateText += "<li style='text-align:center'>";
+    dateText += month[calendar.curMonth] +"<br>";
+	// month[]의 해당 달력 월번째가 인덱스값인것을 출력하고 개행한다.
+
+    dateText += "<span style='font-size:18px'>" + calendar.curYear + "</span>";
+	// 달력의 현재 년도를 18px사이즈로 출력한다.
+
+    dateText += "</li>";
+    dateText += "</ul>";
+    dateText += "</div>";
+    dateText += "<table>";
+    dateText += "<tr class = 'weekdays'>";
+    dateText += 
+"<td>일</td><td>월</td><td>화</td><td>수</td><td>목</td><td>금</td><td>토</td>";
+    dateText += "</tr>";
+ // table 안에 클래스가 weekdays 라는 줄에 일 ~ 토 가 입력돼있는 칸을 만든다.
+    
+    for(i=0;i<calendar.numOfWeeks;i++) // 기본값이 0인 i 를 해당월의 주의 갯수만큼 반복하면서 +1해준다.
+    {
+        dateText += "<tr class = 'days'>";
+        for(j=0;j<7;j++)
+        {
+            if(i*7+j<calendar.theDayOfTheWeek || day > calendar.lastDay) 
+		dateText += "<td>&nbsp;</td>";
+	//만약 i*7 + j (i번째주 + 일~토까지 각각 0~6) 가 해당달력의 첫째날의 요일보다 작거나, 날짜가 해당달력의 마지막날보다 크다면, 빈칸을 하나 만들어준다.	
+
+            else if(day == calendar.curDate && calendar.curMonth == curMonth && calendar.curYear == curYear)
+		dateText += "<td class = 'active'>" + day++ + "</td>";
+	//만약 오늘 날짜,월,년도가 달력의 날짜,월,년도와 일치하다면 'active'클래스td 안에 day+1을 해준다.
+
+            else dateText += "<td>" + day++ + "</td>";
+	// 어떤것도 해당되지 않는다면 td안에 day+1을 해준다.
+        }
+
+        dateText += "</tr>";
+    }
+    dateText += "</table>";
+    document.getElementById("calendar").innerHTML = dateText;
+	// table을 완성시키고, "calendar"란 아이디를 가진 태그에 위에 function에서 만든 dateText(달력)을 대입해준다.
+}
+
+
+
+
+function getCalendar()  // 달력설정
+{
+    var date = null;
+	// date는 빈공간으로 초기화해준다.
+    if(calendar.curYear==0) // 만약 달력의 년도가 0이라면, 즉 초기화해주지 않았다면.
+    {
+        date = new Date();
+        calendar.curYear = date.getFullYear();
+        calendar.curMonth = date.getMonth();
+        calendar.curDate = date.getDate();
+    }	// 현재시간을 date에 대입해주고, 달력의 년,월,일을 현재값으로 초기화해준다.
+
+    else date = new Date(calendar.curYear, calendar.curMonth, 1);
+    	// 그렇지않다면, date에 달력의 현재 년도, 달력의 현재 월, 1일 을 대입해준다.
+     
+    getLastDayOfTheMonth();
+	// getLastDayOfTheMonth() function을 호출한다.
+
+    getNumberOfWeeks(date);
+	// getNumberOfWeeks()에 위에서 설정해준 date를 넣어서 호출한다.
+}
+
+---------------------------------------------------------------
+
+function getLastDayOfTheMonth()	// 해당 달의 마지막날을 구하는 function.
+{
+    var lastDay = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+	// lastDay라는 배열에 (1월 ~ 12월의 고정된 마지막날을 대입해준다.)
+
+    if(calendar.curYear%4 == 0 && calendar.curYear%100 != 0){
+        lastDay[1] = 29;
+    }    
+    else if(calendar.curYear%400==0){
+        lastDay[1] = 29;
+    }
+	// 만약 달력의 년도가 4의배수이고 100의 배수가 아닐때와 달력의 년도가 400의 배수일때 2월은 29일이된다.( 윤달 )
+
+    calendar.lastDay = lastDay[calendar.curMonth];
+	// 달력의 마지막날에 lastDay배열의 달력의 월번째를 인덱스값안에 있는 수를 대입해준다. 
+}
+
+---------------------------------------------------------
+function getNumberOfWeeks(date) // 해당 달의 주를 설정하는 function
+{
+    calendar.theDayOfTheWeek = new Date(calendar.curYear, calendar.curMonth, 1).getDay();
+	// 달력의 첫째날의 요일 = 달력의 년도, 달력의 월 , 1일 의 요일을 대입해준다.
+
+    calendar.numOfWeeks = Math.floor((calendar.theDayOfTheWeek + calendar.lastDay)/7);
+	// 달력의 주의 수 = 달력의 첫째날의 요일 + 달력의 마지막날을 7로 나눈것을 내림한 수이다.
+
+    calendar.numOfWeeks = (calendar.theDayOfTheWeek + calendar.lastDay)%7==0? calendar.numOfWeeks : calendar.numOfWeeks+1;
+	// 달력의 주의 수 = 달력의 첫째날의 요일 + 달력의 마지막날이 7의 배수이면, 위에 구한 수를 대입하고, 아니라면 위에 구한 수에 1을 더한값을 대입해준다.
+
+}
+
+--------------------------------------------------
+function nextMonth(num)	// 달력을 바꿔주는 function
+{
+    calendar.curMonth += num;	// 달력의 월에 받은값을 더해준다.
+    if(calendar.curMonth == -1)	
+    {
+        calendar.curMonth = 11;
+        calendar.curYear--;
+    }
+	// 만약 달력의 월이 -1 이라면, 달력의 월을 11로 바꿔주고 ( 12월이다 ) 년도를 하나 깎는다.
+
+    else if(calendar.curMonth == 12)
+    {
+        calendar.curMonth = 0;
+        calendar.curYear++;
+    }
+	// 만약 달력의 월이 12라면, 달력의 월을 0으로 바꿔주고 ( 1월이다 ) 년도를 하나 추가한다.
+
+    showCalendar();
+	// 설정한 달력을 출력한다.
+}
+
+
+
+
+
+
+
+
+
+
+
